@@ -1,69 +1,111 @@
-import time
 import random
 
-def print_with_pause(text, pause_time=1):
-  """Печатает текст с паузой между словами."""
-  for word in text.split():
-    print(word, end=" ", flush=True)
-    time.sleep(pause_time)
-  print()
+# Словарь с описанием персонажей
+characters = {
+    "рыцарь": "храбрый и сильный воин, вооруженный мечом и щитом",
+    "маг": "мощный волшебник, способный управлять магией",
+    "воин": "опытный боец, вооруженный топором и щитом",
+    "лучник": "ловкий стрелок, метко поражающий врагов издалека"
+}
 
-def start_game():
-  """Начало игры."""
-  print_with_pause("Ты, студент, заходишь в уютное кафе, чтобы выпить чашечку любимого кофе.")
-  print_with_pause("На диване уютно разлегся милый кот.")
-  print_with_pause("Ты решаешь познакомиться с ним.")
-  play_with_cat()
+# Список возможных действий
+actions = ["атаковать", "защищаться", "использовать магию", "бежать", "использовать стрелы"]
 
-def play_with_cat():
-  """Функция для взаимодействия с котом."""
+# Кортеж с описанием монстров
+monsters = (
+    ("Гоблин", 5, 2, "слабый противник"),
+    ("Огр", 10, 4, "сильный и грубый"),
+    ("Дракон", 20, 8, "мощный и опасный"),
+    ("Скелет-воин", 7, 3, "быстрый и живучий"),
+    ("Ведьма", 6, 2, "опасна своей магией")
+)
 
-  actions = [
-    "Погладить кота за ушком.",
-    "Предложить коту кофе.",
-    "Сделать селфи с котом.",
-  ]
+# Функция для выбора персонажа
+def choose_character():
+    print("Выберите своего персонажа:")
+    for i, character in enumerate(characters.keys()):
+        print(f"{i+1}. {character} ({characters[character]})")
+    while True:
+        choice = input("Введите номер персонажа: ")
+        if choice.isdigit() and 1 <= int(choice) <= len(characters):
+            return list(characters.keys())[int(choice)-1]
+        else:
+            print("Неверный ввод. Пожалуйста, введите номер персонажа.")
 
-  while actions:
-    print_with_pause("Что ты хочешь сделать с котиком?")
+# Функция для описания ситуации
+def describe_situation(level, monster):
+    print(f"\n--- Уровень {level} ---")
+    print(f"Вы столкнулись с {monster[0]}!")
+    print(f"У него {monster[1]} очков здоровья.")
+
+# Функция для хода игрока
+def player_turn(player_hp, monster_hp, monster):
+    print("\nВыберите действие:")
     for i, action in enumerate(actions):
-      print(f"{i+1}. {action}")
+        print(f"{i+1}. {action}")
+    while True:
+        choice = input("Введите номер действия: ")
+        if choice.isdigit() and 1 <= int(choice) <= len(actions):
+            action = actions[int(choice)-1]
+            if action == "атаковать":
+                attack_damage = random.randint(1, 5)
+                monster_hp -= attack_damage
+                print(f"Вы атаковали {monster[0]} и нанесли {attack_damage} урона!")
+            elif action == "защищаться":
+                print(f"Вы защищаетесь.")
+            elif action == "использовать магию":
+                if player_hp < 5:
+                    print("У вас недостаточно маны!")
+                else:
+                    magic_damage = random.randint(3, 7)
+                    monster_hp -= magic_damage
+                    player_hp -= 5
+                    print(f"Вы использовали магию и нанесли {magic_damage} урона!")
+            elif action == "использовать стрелы":
+                if characters == "лучник":
+                    arrow_damage = random.randint(2, 6)
+                    monster_hp -= arrow_damage
+                    print(f"Вы выпустили стрелу и нанесли {arrow_damage} урона!")
+                else:
+                    print(f"У вас нет стрел!")
+            elif action == "бежать":
+                print(f"Вы пытаетесь убежать...")
+                if random.random() < 0.5:
+                    print("Вам удалось убежать!")
+                    return False
+                else:
+                    print(f"Вам не удалось убежать!")
+            return player_hp, monster_hp
+        else:
+            print("Неверный ввод. Пожалуйста, введите номер действия.")
 
-    choice = input("Введи номер действия: ")
+# Функция для хода монстра
+def monster_turn(player_hp, monster_hp, monster):
+    monster_attack = random.randint(1, monster[2])
+    player_hp -= monster_attack
+    print(f"{monster[0]} атаковал вас и нанес {monster_attack} урона!")
+    return player_hp, monster_hp
 
-    try:
-      choice_index = int(choice) - 1
-      if 0 <= choice_index < len(actions):
-        action = actions.pop(choice_index)
-        print_with_pause(f"Ты {action}")
-        print()
-        if action == "Погладить кота за ушком.":
-          pet_cat()
-        elif action == "Предложить коту кофе.":
-          offer_coffee()
-        elif action == "Сделать селфи с котом.":
-          take_selfie()
-      else:
-        print_with_pause("Неверный выбор. Попробуй еще раз.")
-    except ValueError:
-      print_with_pause("Неверный ввод. Попробуй ввести число.")
-
-  print_with_pause("Ты хотел еще побыть с котиком, но у тебя почти не осталось времени и тебе уже пора уезжать по делам.")
-
-def pet_cat():
-  """Погладить кота."""
-  print_with_pause("Ты нежно гладишь кота по голове. Он мурлычет от удовольствия и трется о твою руку.")
-
-def offer_coffee():
-  """Предложить коту кофе."""
-  print_with_pause("Ты поднимаешь чашку с кофе и предлагаешь ее коту.")
-  print_with_pause("Кот смотрит на тебя с интересом, но, конечно, отказывается. Он просто трется о твою ногу.")
-
-def take_selfie():
-  """Сделать селфи с котом."""
-  print_with_pause("Ты делаешь селфи с котом. Получается милая фотография.")
-  print_with_pause("Кот смотрит на тебя с интересом.")
-
-if __name__ == "__main__":
-  start_game()
-
+# Основная функция игры
+def play_game():
+    character = choose_character()
+    print(f"\nВы выбрали персонажа {character}!")
+    player_hp = 10
+    level = 1
+    while level <= 3:
+        monster = monsters[level-1]
+        describe_situation(level, monster)
+        monster_hp = monster[1]
+        while player_hp > 0 and monster_hp > 0:
+            player_hp, monster_hp = player_turn(player_hp, monster_hp, monster)
+            if monster_hp > 0:
+                player_hp, monster_hp = monster_turn(player_hp, monster_hp, monster)
+        if player_hp <= 0:
+            print(f"\n{monster[0]} победил вас!")
+            break
+        else:
+            print(f"\nВы победили {monster[0]}!")
+            level += 1
+    if level > 3:
+        print("\nПоздравляю, вы прошли все уровни!")
+play_game()
